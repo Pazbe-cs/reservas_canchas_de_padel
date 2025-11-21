@@ -8,14 +8,20 @@ Incluye un backend en Java con Maven y un frontend en Angular, organizados de ma
  Estructura del Proyecto
 
 reservas_canchas_de_padel/
-├── backend/ → API REST en Java + Maven
-│ ├── src/
-│ ├── pom.xml
-│ └── target/
-└── frontend/ → Aplicación web en Angular
-├── src/
-├── angular.json
-└── package.json
+│
+├── backend/                 
+│   ├── src/
+│   ├── pom.xml
+│   └── target/
+│
+├── frontend/                
+│   ├── src/
+│   ├── angular.json
+│   └── package.json
+│
+└── README.md
+
+
 Antes de comenzar utilice:
 
 SDKMAN (WSL/Ubuntu) → para manejar versiones de Java
@@ -125,5 +131,16 @@ docker run hello-world
 
 
 
+ 📸 Evidencias de Instalación
 
-Docker Desktop (Windows) → para la ejecución de contenedores
+### ✔️ Instalación de Node.js con NVM
+![NVM Install](docs/nvm-install.png)
+
+### ✔️ Ejecución exitosa de Docker (hello-world)
+![Docker Hello World](docs/docker-hello-world.png)
+
+### ✔️ Verificación de Angular CLI
+![Angular Version](docs/angular-version.png)
+
+
+
