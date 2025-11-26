@@ -1,0 +1,97 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-horario-heading" data-cy="HorarioCreateUpdateHeading">Create or edit a Horario</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let diaRef = editForm.get('dia')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dia">Dia</label>
+          <input type="text" class="form-control" name="dia" id="field_dia" data-cy="dia" formControlName="dia" />
+          @if (diaRef.invalid && (diaRef.dirty || diaRef.touched)) {
+            <div>
+              @if (editForm.get('dia')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaInicioRef = editForm.get('horaInicio')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaInicio">Hora Inicio</label>
+          <input
+            type="time"
+            class="form-control"
+            name="horaInicio"
+            id="field_horaInicio"
+            data-cy="horaInicio"
+            formControlName="horaInicio"
+          />
+          @if (horaInicioRef.invalid && (horaInicioRef.dirty || horaInicioRef.touched)) {
+            <div>
+              @if (editForm.get('horaInicio')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaFinRef = editForm.get('horaFin')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaFin">Hora Fin</label>
+          <input type="time" class="form-control" name="horaFin" id="field_horaFin" data-cy="horaFin" formControlName="horaFin" />
+          @if (horaFinRef.invalid && (horaFinRef.dirty || horaFinRef.touched)) {
+            <div>
+              @if (editForm.get('horaFin')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_cancha">Cancha</label>
+          <select
+            class="form-control"
+            id="field_cancha"
+            data-cy="cancha"
+            name="cancha"
+            formControlName="cancha"
+            [compareWith]="compareCancha"
+          >
+            <option [ngValue]="null"></option>
+            @for (canchaOption of canchasSharedCollection; track $index) {
+              <option [ngValue]="canchaOption">{{ canchaOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

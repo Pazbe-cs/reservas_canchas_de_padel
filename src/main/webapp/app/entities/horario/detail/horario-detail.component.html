@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (horario(); as horarioRef) {
+      <div>
+        <h2 data-cy="horarioDetailsHeading"><span>Horario</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ horarioRef.id }}</span>
+          </dd>
+          <dt><span>Dia</span></dt>
+          <dd>
+            <span>{{ horarioRef.dia }}</span>
+          </dd>
+          <dt><span>Hora Inicio</span></dt>
+          <dd>
+            <span>{{ horarioRef.horaInicio }}</span>
+          </dd>
+          <dt><span>Hora Fin</span></dt>
+          <dd>
+            <span>{{ horarioRef.horaFin }}</span>
+          </dd>
+          <dt><span>Cancha</span></dt>
+          <dd>
+            @if (horario()!.cancha) {
+              <div>
+                <a [routerLink]="['/cancha', horario()!.cancha?.id, 'view']">{{ horarioRef.cancha?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/horario', horarioRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

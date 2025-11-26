@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (pago(); as pagoRef) {
+      <div>
+        <h2 data-cy="pagoDetailsHeading"><span>Pago</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ pagoRef.id }}</span>
+          </dd>
+          <dt><span>Fecha</span></dt>
+          <dd>
+            <span>{{ pagoRef.fecha | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Monto</span></dt>
+          <dd>
+            <span>{{ pagoRef.monto }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/pago', pagoRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

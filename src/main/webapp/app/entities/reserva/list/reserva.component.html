@@ -1,0 +1,139 @@
+<div>
+  <h2 id="page-heading" data-cy="ReservaHeading">
+    <span>Reservas</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-reserva"
+        [routerLink]="['/reserva/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Reserva</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (reservas().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Reservas found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fecha">
+              <div class="d-flex">
+                <span>Fecha</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="horaInicio">
+              <div class="d-flex">
+                <span>Hora Inicio</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="horaFin">
+              <div class="d-flex">
+                <span>Hora Fin</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="pago.id">
+              <div class="d-flex">
+                <span>Pago</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="usuario.id">
+              <div class="d-flex">
+                <span>Usuario</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="cancha.id">
+              <div class="d-flex">
+                <span>Cancha</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reserva of reservas(); track trackId(reserva)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/reserva', reserva.id, 'view']">{{ reserva.id }}</a>
+              </td>
+              <td>{{ reserva.fecha | formatMediumDate }}</td>
+              <td>{{ reserva.horaInicio }}</td>
+              <td>{{ reserva.horaFin }}</td>
+              <td>
+                @if (reserva.pago) {
+                  <div>
+                    <a [routerLink]="['/pago', reserva.pago.id, 'view']">{{ reserva.pago.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (reserva.usuario) {
+                  <div>
+                    <a [routerLink]="['/usuario', reserva.usuario.id, 'view']">{{ reserva.usuario.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (reserva.cancha) {
+                  <div>
+                    <a [routerLink]="['/cancha', reserva.cancha.id, 'view']">{{ reserva.cancha.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/reserva', reserva.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/reserva', reserva.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(reserva)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
