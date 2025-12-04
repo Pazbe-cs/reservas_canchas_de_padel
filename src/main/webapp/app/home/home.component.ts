@@ -7,11 +7,14 @@ import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
+// 👇 IMPORTAMOS TU COMPONENTE AQUÍ
+import { VolverInicioComponent } from '../volver-inicio/volver-inicio.component';
+
 @Component({
   selector: 'jhi-home',
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
-  imports: [SharedModule, RouterModule],
+  styleUrls: ['./home.component.scss'], // (corregido: styleUrls en plural)
+  imports: [SharedModule, RouterModule, VolverInicioComponent], // 👈 AÑADIDO TU COMPONENTE
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);

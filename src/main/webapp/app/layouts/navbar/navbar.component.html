@@ -1,7 +1,10 @@
 <nav data-cy="navbar" class="navbar navbar-dark navbar-expand-md bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
-      <span class="logo-img"></span>
+      <li class="nav-item">
+     <a class="nav-link" routerLink="/volver" routerLinkActive="active">Volver</a>
+</li>
+     <span class="logo-img"></span>
       <span class="navbar-title">ReservasPadel</span>
       <span class="navbar-version">{{ version }}</span>
     </a>

@@ -1,110 +1,61 @@
-jest.mock('app/core/auth/account.service');
+<div class="row">
+  <div class="col-md-3">
+    <span class="hipster img-fluid rounded"></span>
+  </div>
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { Subject, of } from 'rxjs';
+  <div class="col-md-9">
+    <h1 class="display-4"><span>Welcome, Java Hipster!</span> (Reservas Padel)</h1>
 
-import { AccountService } from 'app/core/auth/account.service';
-import { Account } from 'app/core/auth/account.model';
+    <p class="lead">This is your homepage</p>
 
-import HomeComponent from './home.component';
+    <!-- 👇 AQUÍ AGREGAMOS TU COMPONENTE DEL BOTÓN -->
+    <jhi-volver-inicio></jhi-volver-inicio>
 
-describe('Home Component', () => {
-  let comp: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
-  let mockAccountService: AccountService;
-  let mockRouter: Router;
-  const account: Account = {
-    activated: true,
-    authorities: [],
-    email: '',
-    firstName: null,
-    langKey: '',
-    lastName: null,
-    login: 'login',
-    imageUrl: null,
-  };
+    <div>
+      @if (account() !== null) {
+        <div class="alert alert-success">
+          @if (account(); as accountRef) {
+            <span id="home-logged-message">You are logged in as user &quot;{{ accountRef.login }}&quot;.</span>
+          }
+        </div>
+      } @else {
+        <div class="alert alert-warning">
+          <span>If you want to </span>
+          <a class="alert-link" (click)="login()">sign in</a
+          ><span
+            >, you can try the default accounts:<br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;) <br />- User
+            (login=&quot;user&quot; and password=&quot;user&quot;).</span
+          >
+        </div>
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HomeComponent],
-      providers: [AccountService],
-    })
-      .overrideTemplate(HomeComponent, '')
-      .compileComponents();
-  }));
+        <div class="alert alert-warning">
+          <span>You don&apos;t have an account yet?</span>&nbsp;
+          <a class="alert-link" routerLink="/account/register">Register a new account</a>
+        </div>
+      }
+    </div>
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(HomeComponent);
-    comp = fixture.componentInstance;
-    mockAccountService = TestBed.inject(AccountService);
-    mockAccountService.identity = jest.fn(() => of(null));
-    mockAccountService.getAuthenticationState = jest.fn(() => of(null));
+    <p>If you have any question on JHipster:</p>
 
-    mockRouter = TestBed.inject(Router);
-    jest.spyOn(mockRouter, 'navigate').mockImplementation(() => Promise.resolve(true));
-  });
+    <ul>
+      <li><a href="https://www.jhipster.tech/" target="_blank" rel="noopener noreferrer">JHipster homepage</a></li>
+      <li>
+        <a href="https://stackoverflow.com/tags/jhipster/info" target="_blank" rel="noopener noreferrer">JHipster on Stack Overflow</a>
+      </li>
+      <li>
+        <a href="https://github.com/jhipster/generator-jhipster/issues?state=open" target="_blank" rel="noopener noreferrer"
+          >JHipster bug tracker</a
+        >
+      </li>
+      <li>
+        <a href="https://gitter.im/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">JHipster public chat room</a>
+      </li>
+      <li><a href="https://twitter.com/jhipster" target="_blank" rel="noopener noreferrer">follow &#64;jhipster on Twitter</a></li>
+    </ul>
 
-  describe('ngOnInit', () => {
-    it('should synchronize account variable with current account', () => {
-      // GIVEN
-      const authenticationState = new Subject<Account | null>();
-      mockAccountService.getAuthenticationState = jest.fn(() => authenticationState.asObservable());
-
-      // WHEN
-      comp.ngOnInit();
-
-      // THEN
-      expect(comp.account()).toBeNull();
-
-      // WHEN
-      authenticationState.next(account);
-
-      // THEN
-      expect(comp.account()).toEqual(account);
-
-      // WHEN
-      authenticationState.next(null);
-
-      // THEN
-      expect(comp.account()).toBeNull();
-    });
-  });
-
-  describe('login', () => {
-    it('should navigate to /login on login', () => {
-      // WHEN
-      comp.login();
-
-      // THEN
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
-    });
-  });
-
-  describe('ngOnDestroy', () => {
-    it('should destroy authentication state subscription on component destroy', () => {
-      // GIVEN
-      const authenticationState = new Subject<Account | null>();
-      mockAccountService.getAuthenticationState = jest.fn(() => authenticationState.asObservable());
-
-      // WHEN
-      comp.ngOnInit();
-
-      // THEN
-      expect(comp.account()).toBeNull();
-
-      // WHEN
-      authenticationState.next(account);
-
-      // THEN
-      expect(comp.account()).toEqual(account);
-
-      // WHEN
-      comp.ngOnDestroy();
-      authenticationState.next(null);
-
-      // THEN
-      expect(comp.account()).toEqual(account);
-    });
-  });
-});
+    <p>
+      <span>If you like JHipster, don&apos;t forget to give us a star on</span>
+      <a href="https://github.com/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">GitHub</a>!
+    </p>
+  </div>
+</div>
