@@ -1,0 +1,46 @@
+.proceso-principal {
+  h2 {
+    font-weight: 600;
+  }
+}
+
+.tarjeta-resumen {
+  color: #fff;
+  margin-bottom: 1rem;
+
+  .card-body {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+}
+
+.tarjeta-success {
+  background-color: #28a745;
+}
+
+.tarjeta-danger {
+  background-color: #dc3545;
+}
+
+.tarjeta-primary {
+  background-color: #007bff;
+}
+
+.card-header {
+  font-weight: 600;
+}

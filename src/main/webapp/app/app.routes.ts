@@ -32,11 +32,21 @@ const routes: Routes = [
     loadComponent: () => import('./login/login.component'),
     title: 'login.title',
   },
+
+  // === RUTA VOLVER ===
   {
     path: 'volver',
     loadComponent: () =>
       import('./volver-inicio/volver-inicio.component').then(m => m.VolverInicioComponent),
   },
+
+  // === RUTA PROCESO PRINCIPAL / DASHBOARD ===
+  {
+    path: 'proceso-principal',
+    loadComponent: () =>
+      import('./proceso-principal/proceso-principal.component').then(m => m.ProcesoPrincipalComponent),
+  },
+
   {
     path: '',
     loadChildren: () => import('./entities/entity.routes'),
