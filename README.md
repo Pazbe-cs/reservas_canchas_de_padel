@@ -45,8 +45,7 @@ Incluye validaciones obligatorias (@NotNull, @NotBlank):
 @NotBlank private String horaInicio;
 @NotBlank private String horaFin;
 
-yaml
-Copy code
+
 
 ---
 
@@ -60,23 +59,21 @@ private String horaFin;
 private Long canchaId;
 private Long usuarioId;
 
-yaml
-Copy code
 
 ---
 
 📌 4. Lógica del Servicio (ProcesoReservaService)
 
-### 🔹 validarDisponibilidad(request)
+🔹 validarDisponibilidad(request)
 Retorna **true** o **false** si existe un choque de horarios.
 
-### 🔹 crearReserva(request)
+🔹 crearReserva(request)
 Guarda la reserva correctamente en la base de datos.
 
-### 🔹 obtenerPorId(id)
+🔹 obtenerPorId(id)
 Devuelve una reserva específica según su ID.
 
-### 🔹 cancelarReserva(id)
+ 🔹 cancelarReserva(id)
 Simula la cancelación de una reserva.
 
 ---
