@@ -1,0 +1,136 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-reserva-heading" data-cy="ReservaCreateUpdateHeading">Create or edit a Reserva</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let fechaRef = editForm.get('fecha')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fecha">Fecha</label>
+          <div class="input-group">
+            <input
+              id="field_fecha"
+              data-cy="fecha"
+              type="text"
+              class="form-control"
+              name="fecha"
+              ngbDatepicker
+              #fechaDp="ngbDatepicker"
+              formControlName="fecha"
+            />
+            <button type="button" class="btn btn-secondary" (click)="fechaDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
+          </div>
+          @if (fechaRef.invalid && (fechaRef.dirty || fechaRef.touched)) {
+            <div>
+              @if (editForm.get('fecha')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaInicioRef = editForm.get('horaInicio')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaInicio">Hora Inicio</label>
+          <input
+            type="time"
+            class="form-control"
+            name="horaInicio"
+            id="field_horaInicio"
+            data-cy="horaInicio"
+            formControlName="horaInicio"
+          />
+          @if (horaInicioRef.invalid && (horaInicioRef.dirty || horaInicioRef.touched)) {
+            <div>
+              @if (editForm.get('horaInicio')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaFinRef = editForm.get('horaFin')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaFin">Hora Fin</label>
+          <input type="time" class="form-control" name="horaFin" id="field_horaFin" data-cy="horaFin" formControlName="horaFin" />
+          @if (horaFinRef.invalid && (horaFinRef.dirty || horaFinRef.touched)) {
+            <div>
+              @if (editForm.get('horaFin')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_pago">Pago</label>
+          <select class="form-control" id="field_pago" data-cy="pago" name="pago" formControlName="pago" [compareWith]="comparePago">
+            <option [ngValue]="null"></option>
+            @for (pagoOption of pagosCollection; track $index) {
+              <option [ngValue]="pagoOption">{{ pagoOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_usuario">Usuario</label>
+          <select
+            class="form-control"
+            id="field_usuario"
+            data-cy="usuario"
+            name="usuario"
+            formControlName="usuario"
+            [compareWith]="compareUsuario"
+          >
+            <option [ngValue]="null"></option>
+            @for (usuarioOption of usuariosSharedCollection; track $index) {
+              <option [ngValue]="usuarioOption">{{ usuarioOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_cancha">Cancha</label>
+          <select
+            class="form-control"
+            id="field_cancha"
+            data-cy="cancha"
+            name="cancha"
+            formControlName="cancha"
+            [compareWith]="compareCancha"
+          >
+            <option [ngValue]="null"></option>
+            @for (canchaOption of canchasSharedCollection; track $index) {
+              <option [ngValue]="canchaOption">{{ canchaOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

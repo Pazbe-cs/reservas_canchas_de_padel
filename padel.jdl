@@ -1,0 +1,55 @@
+application {
+  config {
+    baseName ReservasPadel
+    applicationType monolith
+    packageName com.padel.backend
+    authenticationType jwt
+    databaseType sql
+    devDatabaseType h2Disk
+    prodDatabaseType postgresql
+    buildTool maven
+    enableHibernateCache true
+    enableTranslation false
+    clientFramework angularX
+  }
+  entities *
+}
+
+entity Usuario {
+  nombre String required,
+  email String required,
+  telefono String
+}
+
+entity Cancha {
+  nombre String required,
+  tipo String,
+  precio BigDecimal required
+}
+
+entity Horario {
+  dia String required,
+  horaInicio LocalTime required,
+  horaFin LocalTime required
+}
+
+entity Reserva {
+  fecha LocalDate required,
+  horaInicio LocalTime required,
+  horaFin LocalTime required
+}
+
+entity Pago {
+  fecha Instant required,
+  monto BigDecimal required
+}
+
+relationship OneToMany {
+  Usuario{reservas} to Reserva{usuario}
+  Cancha{reservas} to Reserva{cancha}
+  Cancha{horarios} to Horario{cancha}
+}
+
+relationship OneToOne {
+  Reserva{pago} to Pago{reserva required}
+}

@@ -1,0 +1,204 @@
+<nav data-cy="navbar" class="navbar navbar-dark navbar-expand-md bg-dark">
+  <div class="container-fluid">
+
+    <!-- LOGO + TITULO -->
+    <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
+      <span class="logo-img"></span>
+      <span class="navbar-title">ReservasPadel</span>
+      <span class="navbar-version">{{ version }}</span>
+    </a>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <a
+      class="navbar-toggler d-lg-none"
+      href="javascript:void(0);"
+      data-toggle="collapse"
+      data-target="#navbarResponsive"
+      aria-controls="navbarResponsive"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+      (click)="toggleNavbar()"
+    >
+      <fa-icon icon="bars"></fa-icon>
+    </a>
+
+    <!-- MENU -->
+    <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed()">
+      <ul class="navbar-nav ms-auto">
+
+        <!-- HOME -->
+        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a class="nav-link" routerLink="/" (click)="collapseNavbar()">
+            <fa-icon icon="home"></fa-icon> Home
+          </a>
+        </li>
+
+        <!-- VOLVER -->
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/volver" (click)="collapseNavbar()">
+            <fa-icon icon="arrow-left"></fa-icon> Volver
+          </a>
+        </li>
+
+        <!-- DASHBOARD / PROCESO PRINCIPAL -->
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/proceso-principal" (click)="collapseNavbar()">
+            <fa-icon icon="chart-line"></fa-icon> Dashboard Reservas
+          </a>
+        </li>
+
+        <!-- ENTITIES (solo si está logueado) -->
+        @if (account() !== null) {
+          <li
+            ngbDropdown
+            class="nav-item dropdown pointer"
+            display="dynamic"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
+              <fa-icon icon="th-list"></fa-icon> Entities
+            </a>
+            <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
+              <li>
+                <a class="dropdown-item" routerLink="/usuario" (click)="collapseNavbar()">
+                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Usuario
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/cancha" (click)="collapseNavbar()">
+                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Cancha
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/horario" (click)="collapseNavbar()">
+                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Horario
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/reserva" (click)="collapseNavbar()">
+                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Reserva
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/pago" (click)="collapseNavbar()">
+                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Pago
+                </a>
+              </li>
+            </ul>
+          </li>
+        }
+
+        <!-- ADMIN -->
+        <li
+          *jhiHasAnyAuthority="'ROLE_ADMIN'"
+          ngbDropdown
+          class="nav-item dropdown pointer"
+          display="dynamic"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="admin-menu">
+            <fa-icon icon="users-cog"></fa-icon> Administration
+          </a>
+          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="admin-menu">
+            <li>
+              <a class="dropdown-item" routerLink="/authority" (click)="collapseNavbar()">
+                <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon> Authority
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/admin/user-management" (click)="collapseNavbar()">
+                <fa-icon icon="users" [fixedWidth]="true"></fa-icon> User management
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/admin/metrics" (click)="collapseNavbar()">
+                <fa-icon icon="tachometer-alt" [fixedWidth]="true"></fa-icon> Metrics
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/admin/health" (click)="collapseNavbar()">
+                <fa-icon icon="heart" [fixedWidth]="true"></fa-icon> Health
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/admin/configuration" (click)="collapseNavbar()">
+                <fa-icon icon="cogs" [fixedWidth]="true"></fa-icon> Configuration
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/admin/logs" (click)="collapseNavbar()">
+                <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon> Logs
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- ACCOUNT -->
+        <li
+          ngbDropdown
+          class="nav-item dropdown pointer"
+          display="dynamic"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          @let accountRef = account();
+          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu">
+            @if (!accountRef?.imageUrl) {
+              <fa-icon icon="user"></fa-icon> Account
+            } @else {
+              <img [src]="accountRef!.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
+            }
+          </a>
+          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
+            @if (accountRef !== null) {
+              <li>
+                <a class="dropdown-item" routerLink="/account/settings" (click)="collapseNavbar()">
+                  <fa-icon icon="wrench" [fixedWidth]="true"></fa-icon> Settings
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/account/password" (click)="collapseNavbar()">
+                  <fa-icon icon="lock" [fixedWidth]="true"></fa-icon> Password
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" (click)="logout()" id="logout">
+                  <fa-icon icon="sign-out-alt" [fixedWidth]="true"></fa-icon> Sign out
+                </a>
+              </li>
+            } @else {
+              <li>
+                <a class="dropdown-item" (click)="login()" id="login">
+                  <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon> Sign in
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/account/register" (click)="collapseNavbar()">
+                  <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon> Register
+                </a>
+              </li>
+                  <!-- ENLACE VOLVER -->
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" routerLink="/volver" (click)="collapseNavbar()">
+        <fa-icon icon="arrow-left"></fa-icon>
+        <span>Volver</span>
+      </a>
+    </li>
+
+    <!-- ENLACE DASHBOARD / PROCESO PRINCIPAL -->
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" routerLink="/proceso-principal" (click)="collapseNavbar()">
+        <fa-icon icon="chart-line"></fa-icon>
+        <span>Dashboard Reservas</span>
+      </a>
+    </li>
+
+            }
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

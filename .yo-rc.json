@@ -1,0 +1,22 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "ReservasPadel",
+    "buildTool": "maven",
+    "clientFramework": "angular",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "enableHibernateCache": true,
+    "enableTranslation": false,
+    "entities": ["Usuario", "Cancha", "Horario", "Reserva", "Pago"],
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "ZWVjZDA5ZWE1N2RjM2YzOGE5NTVhMzgxNWU4YWYwYmJlZTc5OWZlZDY5OTA2NjQ0Y2IzMWIzMzA4ZjMzMTdjZjEwYTJjZmZjODlkZjAyYTBhMGZlMmMzODMzOWI3MTU5NzQwNjE1OTBlZWUwYTJhNDQxYjVmNjQwODcwYmNkZWM=",
+    "lastLiquibaseTimestamp": 1764023430000,
+    "monorepository": true,
+    "nativeLanguage": "en",
+    "packageName": "com.padel.backend",
+    "prodDatabaseType": "postgresql",
+    "skipCommitHook": true
+  }
+}

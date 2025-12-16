@@ -1,0 +1,156 @@
+<div class="container-fluid mt-3 proceso-principal">
+  <h2 class="mb-4">Panel de Reservas - Proceso Principal</h2>
+
+  <!-- Tarjetas superiores -->
+  <div class="row mb-4">
+    <div class="col-md-4" *ngFor="let tarjeta of tarjetas">
+      <div class="card tarjeta-resumen" [ngClass]="'tarjeta-' + tarjeta.color">
+        <div class="card-body">
+          <h5 class="card-title">{{ tarjeta.titulo }}</h5>
+          <h3 class="card-value">{{ tarjeta.valor }}</h3>
+          <p class="card-text">{{ tarjeta.descripcion }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="row">
+    <!-- Formulario -->
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          Registro Rápido de Reserva
+        </div>
+
+        <div class="card-body">
+          <form (ngSubmit)="registrarReserva()">
+
+            <!-- Cliente -->
+            <div class="mb-3">
+              <label class="form-label">Cliente</label>
+              <select
+                class="form-select"
+                [(ngModel)]="usuarioIdSeleccionado"
+                name="usuarioId"
+                required
+              >
+                <option [ngValue]="null">Seleccionar cliente...</option>
+                <option *ngFor="let u of usuarios" [ngValue]="u.id">
+                  {{ u.nombre }} - {{ u.telefono }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Cancha -->
+            <div class="mb-3">
+              <label class="form-label">Cancha</label>
+              <select
+                class="form-select"
+                [(ngModel)]="canchaIdSeleccionada"
+                name="canchaId"
+                required
+              >
+                <option [ngValue]="null">Seleccionar cancha...</option>
+                <option [ngValue]="1">Cancha 1</option>
+                <option [ngValue]="2">Cancha 2</option>
+                <option [ngValue]="3">Cancha 3</option>
+                <option [ngValue]="4">Cancha 4</option>
+              </select>
+            </div>
+
+            <!-- Fecha -->
+            <div class="mb-3">
+              <label class="form-label">Fecha</label>
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="fechaSeleccionada"
+                name="fecha"
+                required
+              />
+            </div>
+
+            <!-- Hora inicio -->
+            <div class="mb-3">
+              <label class="form-label">Hora Inicio</label>
+              <input
+                type="time"
+                class="form-control"
+                [(ngModel)]="horaInicioSeleccionada"
+                name="horaInicio"
+                required
+              />
+            </div>
+
+            <!-- Hora fin -->
+            <div class="mb-3">
+              <label class="form-label">Hora Fin</label>
+              <input
+                type="time"
+                class="form-control"
+                [(ngModel)]="horaFinSeleccionada"
+                name="horaFin"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              Registrar Reserva
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          Últimas Reservas
+        </div>
+
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Cancha</th>
+                <th>Horario</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let r of ultimasReservas">
+                <td>{{ r.fecha }}</td>
+                <td>{{ r.cliente }}</td>
+                <td>{{ r.cancha }}</td>
+                <td>{{ r.horario }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success': r.estado === 'Confirmada',
+                      'bg-warning text-dark': r.estado === 'Pendiente',
+                      'bg-danger': r.estado === 'Cancelada'
+                    }"
+                  >
+                    {{ r.estado }}
+                  </span>
+                </td>
+              </tr>
+
+              <tr *ngIf="ultimasReservas.length === 0">
+                <td colspan="5" class="text-center py-3">
+                  No hay reservas registradas aún.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

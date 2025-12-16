@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20251124222930"
+  },
+  "applications": ["ReservasPadel"],
+  "fields": [
+    {
+      "fieldName": "fecha",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "horaInicio",
+      "fieldType": "LocalTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "horaFin",
+      "fieldType": "LocalTime",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Reserva",
+  "relationships": [
+    {
+      "otherEntityName": "pago",
+      "otherEntityRelationshipName": "reserva",
+      "relationshipName": "pago",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "usuario",
+      "otherEntityRelationshipName": "reservas",
+      "relationshipName": "usuario",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "cancha",
+      "otherEntityRelationshipName": "reservas",
+      "relationshipName": "cancha",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}
