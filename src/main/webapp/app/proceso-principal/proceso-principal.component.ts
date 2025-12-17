@@ -1,33 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+import { ProcesoReservaApiService, UsuarioCliente, ReservaApi, ReservaCrearRequest } from './proceso-reserva-api.service';
 
 interface TarjetaResumen {
   titulo: string;
   valor: string;
   descripcion: string;
   color: 'success' | 'danger' | 'primary';
-}
-
-interface UsuarioCliente {
-  id: number;
-  nombre?: string;
-  email?: string;
-  telefono?: string;
-}
-
-interface ReservaApi {
-  id: number;
-  fecha?: string;       // "2025-12-16"
-  horaInicio?: string;  // "18:00"
-  horaFin?: string;     // "19:00"
-  usuarioId?: number;
-  canchaId?: number;
-
-  // si después agregás estos en tu DTO, se llenan solos:
-  usuarioNombre?: string;
-  canchaNombre?: string;
 }
 
 interface ReservaTabla {
@@ -43,10 +24,10 @@ interface ReservaTabla {
   selector: 'jhi-proceso-principal',
   templateUrl: './proceso-principal.component.html',
   styleUrls: ['./proceso-principal.component.scss'],
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
 })
 export class ProcesoPrincipalComponent implements OnInit {
-  constructor(private http: HttpClient) {}
+  constructor(private api: ProcesoReservaApiService) {}
 
   tarjetas: TarjetaResumen[] = [
     { titulo: 'Reservas de Hoy', valor: '0', descripcion: 'Total de reservas registradas hoy', color: 'success' },
@@ -75,12 +56,15 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private cargarUsuarios(): void {
-    this.http.get<UsuarioCliente[]>('/api/usuarios').subscribe({
+    this.api.listarUsuarios().subscribe({
       next: data => {
         this.usuarios = data ?? [];
         if (!this.usuarioIdSeleccionado && this.usuarios.length > 0) {
           this.usuarioIdSeleccionado = this.usuarios[0].id;
         }
+
+        // para que el nombre del cliente se vea bien en la tabla (si reservas ya cargó antes)
+        this.mapearReservasATabla();
       },
       error: err => {
         console.error('Error cargando usuarios', err);
@@ -90,7 +74,7 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private cargarReservas(): void {
-    this.http.get<ReservaApi[]>('/api/reservas-proceso').subscribe({
+    this.api.listarReservas().subscribe({
       next: data => {
         this.reservasApi = data ?? [];
         this.mapearReservasATabla();
@@ -104,13 +88,12 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private mapearReservasATabla(): void {
-    // armamos un mapa de usuarios para mostrar nombre en la tabla aunque el backend devuelva solo usuarioId
     const mapUsuarios = new Map<number, UsuarioCliente>();
     for (const u of this.usuarios) mapUsuarios.set(u.id, u);
 
     this.ultimasReservas = (this.reservasApi ?? [])
       .slice()
-      .reverse() // para ver las últimas al final como nuevas arriba (ajustá si querés)
+      .reverse()
       .slice(0, 10)
       .map(r => {
         const cliente =
@@ -122,7 +105,6 @@ export class ProcesoPrincipalComponent implements OnInit {
         const fecha = r.fecha ? this.formatearFecha(r.fecha) : '-';
         const horario = `${r.horaInicio ?? '--:--'} - ${r.horaFin ?? '--:--'}`;
 
-        // como tu backend no maneja estado real todavía, lo dejamos como Pendiente por defecto
         const estado: ReservaTabla['estado'] = 'Pendiente';
 
         return { fecha, cancha, horario, estado, cliente };
@@ -130,7 +112,7 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private actualizarTarjetas(): void {
-    const hoy = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+    const hoy = new Date().toISOString().slice(0, 10);
     const reservasHoy = this.reservasApi.filter(r => r.fecha === hoy).length;
 
     this.tarjetas = this.tarjetas.map(t => {
@@ -140,7 +122,6 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private formatearFecha(yyyyMmDd: string): string {
-    // "2025-12-16" -> "16/12/2025"
     const [y, m, d] = yyyyMmDd.split('-');
     if (!y || !m || !d) return yyyyMmDd;
     return `${d}/${m}/${y}`;
@@ -156,7 +137,7 @@ export class ProcesoPrincipalComponent implements OnInit {
       return;
     }
 
-    const body = {
+    const body: ReservaCrearRequest = {
       usuarioId: this.usuarioIdSeleccionado,
       canchaId: this.canchaIdSeleccionada,
       fecha: this.fechaSeleccionada,
@@ -164,16 +145,14 @@ export class ProcesoPrincipalComponent implements OnInit {
       horaFin: this.horaFinSeleccionada,
     };
 
-    // 1) validar disponibilidad (si tenés el endpoint)
-    this.http.post<boolean>('/api/reservas-proceso/validar', body).subscribe({
+    this.api.validarDisponibilidad(body).subscribe({
       next: disponible => {
         if (!disponible) {
           alert('La cancha ya está reservada en ese horario.');
           return;
         }
 
-        // 2) registrar reserva real
-        this.http.post('/api/reservas-proceso', body).subscribe({
+        this.api.crearReserva(body).subscribe({
           next: () => {
             alert('Reserva registrada correctamente ✅');
             this.cargarReservas();
@@ -185,8 +164,8 @@ export class ProcesoPrincipalComponent implements OnInit {
         });
       },
       error: () => {
-        // si tu endpoint validar no existe todavía, al menos registramos directo
-        this.http.post('/api/reservas-proceso', body).subscribe({
+        // si el endpoint validar no existe, registramos directo
+        this.api.crearReserva(body).subscribe({
           next: () => {
             alert('Reserva registrada correctamente ✅');
             this.cargarReservas();
