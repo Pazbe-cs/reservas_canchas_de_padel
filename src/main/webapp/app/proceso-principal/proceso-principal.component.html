@@ -1,45 +1,42 @@
-<div class="container-fluid mt-3 proceso-principal">
-  <h2 class="mb-4">Panel de Reservas - Proceso Principal</h2>
+<div class="container-fluid mt-4 proceso-principal">
+  <div class="mb-4">
+    <h2 class="fw-bold mb-1">Panel de Reservas</h2>
+    <span class="text-muted">Gestión de reservas y pagos</span>
+  </div>
 
-  <!-- Tarjetas superiores -->
-  <div class="row mb-4">
+  <!-- Tarjetas -->
+  <div class="row g-3 mb-4">
     <div class="col-md-4" *ngFor="let tarjeta of tarjetas">
-      <div class="card tarjeta-resumen" [ngClass]="'tarjeta-' + tarjeta.color">
+      <div class="card tarjeta-resumen h-100" [ngClass]="'tarjeta-' + tarjeta.color">
         <div class="card-body">
-          <h5 class="card-title">{{ tarjeta.titulo }}</h5>
-          <h3 class="card-value">{{ tarjeta.valor }}</h3>
-          <p class="card-text">{{ tarjeta.descripcion }}</p>
+          <h6 class="card-title text-uppercase">{{ tarjeta.titulo }}</h6>
+          <h2 class="fw-bold mb-1">{{ tarjeta.valor }}</h2>
+          <small>{{ tarjeta.descripcion }}</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Contenido principal -->
-  <div class="row">
-    <!-- ✅ Quitamos el botón Nuevo Cliente porque molestaba -->
-    <!--
-    <a class="btn btn-sm btn-outline-primary mb-2" routerLink="/usuario/new">
-      + Nuevo Cliente
-    </a>
-    -->
-
-    <!-- Formulario -->
-    <div class="col-md-5">
-      <div class="card">
-        <div class="card-header bg-info text-white">Registro de Reserva</div>
+  <div class="row g-4">
+    <!-- FORMULARIO -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white fw-semibold">
+          Registrar reserva
+        </div>
 
         <div class="card-body">
           <form (ngSubmit)="registrarReserva()">
-            <!-- Cliente -->
             <div class="mb-3">
               <label class="form-label">Cliente</label>
               <select class="form-select" [(ngModel)]="usuarioIdSeleccionado" name="usuarioId" required>
                 <option [ngValue]="null">Seleccionar cliente...</option>
-                <option *ngFor="let u of usuarios" [ngValue]="u.id">{{ u.nombre }} - {{ u.telefono }}</option>
+                <option *ngFor="let u of usuarios" [ngValue]="u.id">
+                  {{ u.nombre }} <span *ngIf="u.telefono">- {{ u.telefono }}</span>
+                </option>
               </select>
             </div>
 
-            <!-- Cancha -->
             <div class="mb-3">
               <label class="form-label">Cancha</label>
               <select class="form-select" [(ngModel)]="canchaIdSeleccionada" name="canchaId" required>
@@ -51,46 +48,48 @@
               </select>
             </div>
 
-            <!-- Fecha -->
             <div class="mb-3">
               <label class="form-label">Fecha</label>
               <input type="date" class="form-control" [(ngModel)]="fechaSeleccionada" name="fecha" required />
             </div>
 
-            <!-- Hora inicio -->
-            <div class="mb-3">
-              <label class="form-label">Hora Inicio</label>
-              <input type="time" class="form-control" [(ngModel)]="horaInicioSeleccionada" name="horaInicio" required />
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">Hora inicio</label>
+                <input type="time" class="form-control" [(ngModel)]="horaInicioSeleccionada" name="horaInicio" required />
+              </div>
+              <div class="col-6">
+                <label class="form-label">Hora fin</label>
+                <input type="time" class="form-control" [(ngModel)]="horaFinSeleccionada" name="horaFin" required />
+              </div>
             </div>
 
-            <!-- Hora fin -->
-            <div class="mb-3">
-              <label class="form-label">Hora Fin</label>
-              <input type="time" class="form-control" [(ngModel)]="horaFinSeleccionada" name="horaFin" required />
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Registrar Reserva</button>
+            <button type="submit" class="btn btn-primary w-100 mt-3">
+              Registrar reserva
+            </button>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="col-md-7">
-      <div class="card">
-        <div class="card-header bg-secondary text-white">Últimas Reservas</div>
+    <!-- TABLA -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white fw-semibold">
+          Reservas recientes
+        </div>
 
-        <div class="card-body p-0">
-          <table class="table mb-0">
-            <thead>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
               <tr>
                 <th>Fecha</th>
                 <th>Cliente</th>
                 <th>Cancha</th>
                 <th>Horario</th>
-                <th>Pagó</th>
-                <th>Estado</th>
-                <th>Acción</th> <!-- ✅ NUEVO -->
+                <th class="text-center">Pagó</th>
+                <th class="text-center">Estado</th>
+                <th class="text-end">Acción</th>
               </tr>
             </thead>
 
@@ -101,35 +100,38 @@
                 <td>{{ r.cancha }}</td>
                 <td>{{ r.horario }}</td>
 
-                <td>
-                  <span class="badge" [ngClass]="{ 'bg-success': r.pagado, 'bg-warning text-dark': !r.pagado }">
+                <td class="text-center">
+                  <span class="badge" [ngClass]="r.pagado ? 'bg-success' : 'bg-warning text-dark'">
                     {{ r.pagado ? 'Sí' : 'No' }}
                   </span>
                 </td>
 
-                <td>
-                  <span
-                    class="badge"
-                    [ngClass]="{
-                      'bg-success': r.estado === 'Confirmada',
-                      'bg-warning text-dark': r.estado === 'Pendiente',
-                      'bg-danger': r.estado === 'Cancelada'
-                    }"
-                  >
+                <td class="text-center">
+                  <span class="badge"
+                        [ngClass]="{
+                          'bg-success': r.estado === 'Confirmada',
+                          'bg-secondary': r.estado === 'Pendiente'
+                        }">
                     {{ r.estado }}
                   </span>
                 </td>
 
-                <!-- ✅ NUEVO: botón Pagar -->
-                <td>
-                  <button class="btn btn-sm btn-success" (click)="abrirPago(r)" [disabled]="r.pagado">
-                    Pagar
+                <td class="text-end">
+                  <button
+                    class="btn btn-sm"
+                    [ngClass]="r.pagado ? 'btn-outline-secondary' : 'btn-success'"
+                    (click)="abrirPago(r)"
+                    [disabled]="r.pagado"
+                  >
+                    {{ r.pagado ? 'Pagado' : 'Pagar' }}
                   </button>
                 </td>
               </tr>
 
               <tr *ngIf="ultimasReservas.length === 0">
-                <td colspan="7" class="text-center py-3">No hay reservas registradas aún.</td>
+                <td colspan="7" class="text-center text-muted py-4">
+                  No hay reservas registradas.
+                </td>
               </tr>
             </tbody>
           </table>

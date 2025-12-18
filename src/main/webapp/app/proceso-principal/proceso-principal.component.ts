@@ -25,7 +25,7 @@ interface ReservaApi {
   usuarioId?: number;
   canchaId?: number;
 
-  // ✅ viene del backend (si pagó)
+  // viene del backend (si pagó)
   pagoId?: number;
 
   usuarioNombre?: string;
@@ -33,13 +33,13 @@ interface ReservaApi {
 }
 
 interface ReservaTabla {
-  id: number; // ✅ importante para pagar
+  id: number;
   fecha: string;
   cancha: string;
   horario: string;
   estado: 'Confirmada' | 'Pendiente' | 'Cancelada';
   cliente?: string;
-  pagado: boolean; // ✅ para columna "Pagó"
+  pagado: boolean;
 }
 
 @Component({
@@ -89,7 +89,8 @@ export class ProcesoPrincipalComponent implements OnInit {
     });
   }
 
-  private cargarReservas(): void {
+  // ✅ AHORA ES PÚBLICO
+  cargarReservas(): void {
     this.http.get<ReservaApi[]>('/api/reservas-proceso').subscribe({
       next: data => {
         this.reservasApi = data ?? [];
@@ -144,7 +145,6 @@ export class ProcesoPrincipalComponent implements OnInit {
     return `${d}/${m}/${y}`;
   }
 
-  // ✅ botón de pagar (lo usaremos desde el HTML)
   abrirPago(r: ReservaTabla): void {
     if (r.pagado) return;
 
@@ -168,7 +168,7 @@ export class ProcesoPrincipalComponent implements OnInit {
       },
       error: err => {
         console.error('Error pagando reserva', err);
-        alert('No se pudo registrar el pago. Revisá consola y backend.');
+        alert('No se pudo registrar el pago.');
       },
     });
   }

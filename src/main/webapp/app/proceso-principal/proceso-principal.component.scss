@@ -1,46 +1,121 @@
 .proceso-principal {
-  h2 {
+  // -------------------------
+  // Cards generales
+  // -------------------------
+  .card {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  // -------------------------
+  // Tarjetas resumen
+  // -------------------------
+  .tarjeta-resumen {
+    color: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0;
+    }
+
+    h6 {
+      opacity: 0.9;
+      letter-spacing: 0.04em;
+    }
+
+    small {
+      opacity: 0.85;
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .tarjeta-success {
+    background: linear-gradient(135deg, #2fbf71, #1f8f4e);
+  }
+
+  .tarjeta-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  }
+
+  .tarjeta-danger {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+  }
+
+  // -------------------------
+  // Tabla
+  // -------------------------
+  .table {
+    margin-bottom: 0;
+
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b7280;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background-color: #f9fafb;
+    }
+  }
+
+  // -------------------------
+  // Badges
+  // -------------------------
+  .badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
     font-weight: 600;
   }
-}
 
-.tarjeta-resumen {
-  color: #fff;
-  margin-bottom: 1rem;
-
-  .card-body {
-    padding: 1.25rem 1.5rem;
+  // -------------------------
+  // Botones
+  // -------------------------
+  .btn {
+    border-radius: 10px;
+    font-weight: 600;
   }
 
-  .card-title {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  .btn-success {
+    background-color: #16a34a;
+    border-color: #16a34a;
+
+    &:hover {
+      background-color: #15803d;
+      border-color: #15803d;
+    }
   }
 
-  .card-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
+  .btn-outline-secondary {
+    opacity: 0.8;
+    cursor: not-allowed;
   }
 
-  .card-text {
-    font-size: 0.9rem;
-    opacity: 0.9;
+  // -------------------------
+  // Formularios
+  // -------------------------
+  .form-control,
+  .form-select {
+    border-radius: 10px;
   }
-}
 
-.tarjeta-success {
-  background-color: #28a745;
-}
-
-.tarjeta-danger {
-  background-color: #dc3545;
-}
-
-.tarjeta-primary {
-  background-color: #007bff;
-}
-
-.card-header {
-  font-weight: 600;
+  .card-header {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+  }
 }

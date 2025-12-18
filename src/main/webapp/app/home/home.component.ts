@@ -7,20 +7,22 @@ import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
-// 👇 IMPORTAMOS TU COMPONENTE AQUÍ
+// 👇 Tu componente
 import { VolverInicioComponent } from '../volver-inicio/volver-inicio.component';
 
 @Component({
   selector: 'jhi-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'], // (corregido: styleUrls en plural)
-  imports: [SharedModule, RouterModule, VolverInicioComponent], // 👈 AÑADIDO TU COMPONENTE
+  styleUrls: ['./home.component.scss'],
+  imports: [SharedModule, RouterModule, VolverInicioComponent],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
 
-  private readonly destroy$ = new Subject<void>();
+  // ✅ Año para el footer
+  currentYear = new Date().getFullYear();
 
+  private readonly destroy$ = new Subject<void>();
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
 
