@@ -16,6 +16,10 @@ export interface ReservaApi {
   horaFin?: string;
   usuarioId?: number;
   canchaId?: number;
+
+  // ✅ NUEVO: si viene pagoId, está pagada
+  pagoId?: number;
+
   usuarioNombre?: string;
   canchaNombre?: string;
 }
@@ -26,6 +30,11 @@ export interface ReservaCrearRequest {
   fecha: string;
   horaInicio: string;
   horaFin: string;
+}
+
+// ✅ NUEVO: request para pagar
+export interface PagarRequest {
+  monto: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -46,5 +55,10 @@ export class ProcesoReservaApiService {
 
   crearReserva(payload: ReservaCrearRequest): Observable<any> {
     return this.http.post('/api/reservas-proceso', payload);
+  }
+
+  // ✅ NUEVO: pagar una reserva
+  pagarReserva(reservaId: number, payload: PagarRequest): Observable<any> {
+    return this.http.put(`/api/reservas-proceso/${reservaId}/pagar`, payload);
   }
 }

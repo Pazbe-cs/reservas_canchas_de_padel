@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { ProcesoReservaApiService, UsuarioCliente, ReservaApi, ReservaCrearRequest } from './proceso-reserva-api.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 interface TarjetaResumen {
   titulo: string;
@@ -11,12 +10,36 @@ interface TarjetaResumen {
   color: 'success' | 'danger' | 'primary';
 }
 
+interface UsuarioCliente {
+  id: number;
+  nombre?: string;
+  email?: string;
+  telefono?: string;
+}
+
+interface ReservaApi {
+  id: number;
+  fecha?: string;
+  horaInicio?: string;
+  horaFin?: string;
+  usuarioId?: number;
+  canchaId?: number;
+
+  // ✅ viene del backend (si pagó)
+  pagoId?: number;
+
+  usuarioNombre?: string;
+  canchaNombre?: string;
+}
+
 interface ReservaTabla {
+  id: number; // ✅ importante para pagar
   fecha: string;
   cancha: string;
   horario: string;
   estado: 'Confirmada' | 'Pendiente' | 'Cancelada';
   cliente?: string;
+  pagado: boolean; // ✅ para columna "Pagó"
 }
 
 @Component({
@@ -24,10 +47,10 @@ interface ReservaTabla {
   selector: 'jhi-proceso-principal',
   templateUrl: './proceso-principal.component.html',
   styleUrls: ['./proceso-principal.component.scss'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
 })
 export class ProcesoPrincipalComponent implements OnInit {
-  constructor(private api: ProcesoReservaApiService) {}
+  constructor(private http: HttpClient) {}
 
   tarjetas: TarjetaResumen[] = [
     { titulo: 'Reservas de Hoy', valor: '0', descripcion: 'Total de reservas registradas hoy', color: 'success' },
@@ -35,18 +58,14 @@ export class ProcesoPrincipalComponent implements OnInit {
     { titulo: 'Ingresos del Día', valor: '-', descripcion: 'Monto estimado por reservas', color: 'danger' },
   ];
 
-  // Datos reales
   usuarios: UsuarioCliente[] = [];
   reservasApi: ReservaApi[] = [];
-
-  // Tabla de UI
   ultimasReservas: ReservaTabla[] = [];
 
-  // Form
   canchaIdSeleccionada: number | null = null;
   usuarioIdSeleccionado: number | null = null;
 
-  fechaSeleccionada = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+  fechaSeleccionada = new Date().toISOString().slice(0, 10);
   horaInicioSeleccionada = '18:00';
   horaFinSeleccionada = '19:00';
 
@@ -56,25 +75,22 @@ export class ProcesoPrincipalComponent implements OnInit {
   }
 
   private cargarUsuarios(): void {
-    this.api.listarUsuarios().subscribe({
+    this.http.get<UsuarioCliente[]>('/api/usuarios').subscribe({
       next: data => {
         this.usuarios = data ?? [];
         if (!this.usuarioIdSeleccionado && this.usuarios.length > 0) {
           this.usuarioIdSeleccionado = this.usuarios[0].id;
         }
-
-        // para que el nombre del cliente se vea bien en la tabla (si reservas ya cargó antes)
         this.mapearReservasATabla();
       },
       error: err => {
         console.error('Error cargando usuarios', err);
-        alert('No se pudo cargar el listado de clientes (usuarios). Revisá el token/roles.');
       },
     });
   }
 
   private cargarReservas(): void {
-    this.api.listarReservas().subscribe({
+    this.http.get<ReservaApi[]>('/api/reservas-proceso').subscribe({
       next: data => {
         this.reservasApi = data ?? [];
         this.mapearReservasATabla();
@@ -82,7 +98,7 @@ export class ProcesoPrincipalComponent implements OnInit {
       },
       error: err => {
         console.error('Error cargando reservas', err);
-        alert('No se pudo cargar el listado de reservas. Revisá el token/roles.');
+        alert('No se pudo cargar el listado de reservas.');
       },
     });
   }
@@ -105,9 +121,10 @@ export class ProcesoPrincipalComponent implements OnInit {
         const fecha = r.fecha ? this.formatearFecha(r.fecha) : '-';
         const horario = `${r.horaInicio ?? '--:--'} - ${r.horaFin ?? '--:--'}`;
 
-        const estado: ReservaTabla['estado'] = 'Pendiente';
+        const pagado = !!r.pagoId;
+        const estado: ReservaTabla['estado'] = pagado ? 'Confirmada' : 'Pendiente';
 
-        return { fecha, cancha, horario, estado, cliente };
+        return { id: r.id, fecha, cancha, horario, estado, cliente, pagado };
       });
   }
 
@@ -127,9 +144,38 @@ export class ProcesoPrincipalComponent implements OnInit {
     return `${d}/${m}/${y}`;
   }
 
+  // ✅ botón de pagar (lo usaremos desde el HTML)
+  abrirPago(r: ReservaTabla): void {
+    if (r.pagado) return;
+
+    const montoStr = prompt('Monto a cobrar (solo números):', '150000');
+    if (!montoStr) return;
+
+    const monto = Number(montoStr);
+    if (Number.isNaN(monto) || monto <= 0) {
+      alert('Monto inválido');
+      return;
+    }
+
+    this.pagarReserva(r.id, monto);
+  }
+
+  private pagarReserva(reservaId: number, monto: number): void {
+    this.http.put(`/api/reservas-proceso/${reservaId}/pagar`, { monto }).subscribe({
+      next: () => {
+        alert('Pago registrado ✅');
+        this.cargarReservas();
+      },
+      error: err => {
+        console.error('Error pagando reserva', err);
+        alert('No se pudo registrar el pago. Revisá consola y backend.');
+      },
+    });
+  }
+
   registrarReserva(): void {
     if (!this.usuarioIdSeleccionado) {
-      alert('Seleccioná un cliente (Usuario) del listado.');
+      alert('Seleccioná un cliente.');
       return;
     }
     if (!this.canchaIdSeleccionada) {
@@ -137,7 +183,7 @@ export class ProcesoPrincipalComponent implements OnInit {
       return;
     }
 
-    const body: ReservaCrearRequest = {
+    const body = {
       usuarioId: this.usuarioIdSeleccionado,
       canchaId: this.canchaIdSeleccionada,
       fecha: this.fechaSeleccionada,
@@ -145,34 +191,33 @@ export class ProcesoPrincipalComponent implements OnInit {
       horaFin: this.horaFinSeleccionada,
     };
 
-    this.api.validarDisponibilidad(body).subscribe({
+    this.http.post<boolean>('/api/reservas-proceso/validar', body).subscribe({
       next: disponible => {
         if (!disponible) {
           alert('La cancha ya está reservada en ese horario.');
           return;
         }
 
-        this.api.crearReserva(body).subscribe({
+        this.http.post('/api/reservas-proceso', body).subscribe({
           next: () => {
             alert('Reserva registrada correctamente ✅');
             this.cargarReservas();
           },
           error: err => {
             console.error('Error registrando reserva', err);
-            alert('No se pudo registrar la reserva. Revisá el backend / token / datos.');
+            alert('No se pudo registrar la reserva.');
           },
         });
       },
       error: () => {
-        // si el endpoint validar no existe, registramos directo
-        this.api.crearReserva(body).subscribe({
+        this.http.post('/api/reservas-proceso', body).subscribe({
           next: () => {
             alert('Reserva registrada correctamente ✅');
             this.cargarReservas();
           },
           error: err => {
             console.error('Error registrando reserva', err);
-            alert('No se pudo registrar la reserva. Revisá el backend / token / datos.');
+            alert('No se pudo registrar la reserva.');
           },
         });
       },

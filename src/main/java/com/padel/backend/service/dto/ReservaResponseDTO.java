@@ -11,6 +11,10 @@ public class ReservaResponseDTO {
     private String estado;
     private Long usuarioId;
     private Long canchaId;
+
+    // ✅ NUEVO: para saber si está pagada
+    private Long pagoId;
+
     private Instant creadoEn;
 
     public Long getId() {
@@ -67,6 +71,17 @@ public class ReservaResponseDTO {
 
     public void setCanchaId(Long canchaId) {
         this.canchaId = canchaId;
+    }
+
+    // --------------------------------------------------
+    // ✅ PAGO
+    // --------------------------------------------------
+    public Long getPagoId() {
+        return pagoId;
+    }
+
+    public void setPagoId(Long pagoId) {
+        this.pagoId = pagoId;
     }
 
     public Instant getCreadoEn() {

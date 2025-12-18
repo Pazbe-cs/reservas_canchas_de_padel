@@ -16,41 +16,33 @@
 
   <!-- Contenido principal -->
   <div class="row">
+    <!-- ✅ Quitamos el botón Nuevo Cliente porque molestaba -->
+    <!--
+    <a class="btn btn-sm btn-outline-primary mb-2" routerLink="/usuario/new">
+      + Nuevo Cliente
+    </a>
+    -->
+
     <!-- Formulario -->
     <div class="col-md-5">
       <div class="card">
-        <div class="card-header bg-info text-white">
-          Registro Rápido de Reserva
-        </div>
+        <div class="card-header bg-info text-white">Registro de Reserva</div>
 
         <div class="card-body">
           <form (ngSubmit)="registrarReserva()">
-
             <!-- Cliente -->
             <div class="mb-3">
               <label class="form-label">Cliente</label>
-              <select
-                class="form-select"
-                [(ngModel)]="usuarioIdSeleccionado"
-                name="usuarioId"
-                required
-              >
+              <select class="form-select" [(ngModel)]="usuarioIdSeleccionado" name="usuarioId" required>
                 <option [ngValue]="null">Seleccionar cliente...</option>
-                <option *ngFor="let u of usuarios" [ngValue]="u.id">
-                  {{ u.nombre }} - {{ u.telefono }}
-                </option>
+                <option *ngFor="let u of usuarios" [ngValue]="u.id">{{ u.nombre }} - {{ u.telefono }}</option>
               </select>
             </div>
 
             <!-- Cancha -->
             <div class="mb-3">
               <label class="form-label">Cancha</label>
-              <select
-                class="form-select"
-                [(ngModel)]="canchaIdSeleccionada"
-                name="canchaId"
-                required
-              >
+              <select class="form-select" [(ngModel)]="canchaIdSeleccionada" name="canchaId" required>
                 <option [ngValue]="null">Seleccionar cancha...</option>
                 <option [ngValue]="1">Cancha 1</option>
                 <option [ngValue]="2">Cancha 2</option>
@@ -62,42 +54,22 @@
             <!-- Fecha -->
             <div class="mb-3">
               <label class="form-label">Fecha</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="fechaSeleccionada"
-                name="fecha"
-                required
-              />
+              <input type="date" class="form-control" [(ngModel)]="fechaSeleccionada" name="fecha" required />
             </div>
 
             <!-- Hora inicio -->
             <div class="mb-3">
               <label class="form-label">Hora Inicio</label>
-              <input
-                type="time"
-                class="form-control"
-                [(ngModel)]="horaInicioSeleccionada"
-                name="horaInicio"
-                required
-              />
+              <input type="time" class="form-control" [(ngModel)]="horaInicioSeleccionada" name="horaInicio" required />
             </div>
 
             <!-- Hora fin -->
             <div class="mb-3">
               <label class="form-label">Hora Fin</label>
-              <input
-                type="time"
-                class="form-control"
-                [(ngModel)]="horaFinSeleccionada"
-                name="horaFin"
-                required
-              />
+              <input type="time" class="form-control" [(ngModel)]="horaFinSeleccionada" name="horaFin" required />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-              Registrar Reserva
-            </button>
+            <button type="submit" class="btn btn-primary w-100">Registrar Reserva</button>
           </form>
         </div>
       </div>
@@ -106,9 +78,7 @@
     <!-- Tabla -->
     <div class="col-md-7">
       <div class="card">
-        <div class="card-header bg-secondary text-white">
-          Últimas Reservas
-        </div>
+        <div class="card-header bg-secondary text-white">Últimas Reservas</div>
 
         <div class="card-body p-0">
           <table class="table mb-0">
@@ -118,7 +88,9 @@
                 <th>Cliente</th>
                 <th>Cancha</th>
                 <th>Horario</th>
+                <th>Pagó</th>
                 <th>Estado</th>
+                <th>Acción</th> <!-- ✅ NUEVO -->
               </tr>
             </thead>
 
@@ -128,6 +100,13 @@
                 <td>{{ r.cliente }}</td>
                 <td>{{ r.cancha }}</td>
                 <td>{{ r.horario }}</td>
+
+                <td>
+                  <span class="badge" [ngClass]="{ 'bg-success': r.pagado, 'bg-warning text-dark': !r.pagado }">
+                    {{ r.pagado ? 'Sí' : 'No' }}
+                  </span>
+                </td>
+
                 <td>
                   <span
                     class="badge"
@@ -140,12 +119,17 @@
                     {{ r.estado }}
                   </span>
                 </td>
+
+                <!-- ✅ NUEVO: botón Pagar -->
+                <td>
+                  <button class="btn btn-sm btn-success" (click)="abrirPago(r)" [disabled]="r.pagado">
+                    Pagar
+                  </button>
+                </td>
               </tr>
 
               <tr *ngIf="ultimasReservas.length === 0">
-                <td colspan="5" class="text-center py-3">
-                  No hay reservas registradas aún.
-                </td>
+                <td colspan="7" class="text-center py-3">No hay reservas registradas aún.</td>
               </tr>
             </tbody>
           </table>

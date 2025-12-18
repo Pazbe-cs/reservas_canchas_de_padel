@@ -1,18 +1,21 @@
 package com.padel.backend.service;
 
+import com.padel.backend.domain.Pago;
 import com.padel.backend.domain.Reserva;
-import com.padel.backend.repository.ReservaRepository;
 import com.padel.backend.repository.CanchaRepository;
+import com.padel.backend.repository.PagoRepository;
+import com.padel.backend.repository.ReservaRepository;
 import com.padel.backend.repository.UsuarioRepository;
 import com.padel.backend.service.dto.ReservaRequestDTO;
 import com.padel.backend.service.dto.ReservaResponseDTO;
 import com.padel.backend.service.dto.ReservaValidacionDTO;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
-
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProcesoReservaService {
@@ -20,25 +23,27 @@ public class ProcesoReservaService {
     private final ReservaRepository reservaRepository;
     private final CanchaRepository canchaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PagoRepository pagoRepository;
 
     public ProcesoReservaService(
         ReservaRepository reservaRepository,
         CanchaRepository canchaRepository,
-        UsuarioRepository usuarioRepository
+        UsuarioRepository usuarioRepository,
+        PagoRepository pagoRepository
     ) {
         this.reservaRepository = reservaRepository;
         this.canchaRepository = canchaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.pagoRepository = pagoRepository;
     }
 
     // --------------------------------------------------------
     // VALIDACIÓN DE DISPONIBILIDAD
     // --------------------------------------------------------
     public boolean validarDisponibilidad(ReservaValidacionDTO req) {
-        // Convertir Strings del DTO a LocalDate / LocalTime
-        LocalDate fecha = LocalDate.parse(req.getFecha());           // ej: "2025-12-06"
-        LocalTime horaInicio = LocalTime.parse(req.getHoraInicio()); // ej: "18:00"
-        LocalTime horaFin = LocalTime.parse(req.getHoraFin());       // ej: "19:00"
+        LocalDate fecha = LocalDate.parse(req.getFecha());
+        LocalTime horaInicio = LocalTime.parse(req.getHoraInicio());
+        LocalTime horaFin = LocalTime.parse(req.getHoraFin());
 
         return !reservaRepository.existsByCanchaIdAndFechaAndHoraInicioLessThanEqualAndHoraFinGreaterThanEqual(
             req.getCanchaId(),
@@ -59,7 +64,6 @@ public class ProcesoReservaService {
             throw new RuntimeException("La cancha ya está reservada en ese horario.");
         }
 
-        // Convertimos Strings del DTO a LocalDate / LocalTime
         LocalDate fecha = LocalDate.parse(req.getFecha());
         LocalTime horaInicio = LocalTime.parse(req.getHoraInicio());
         LocalTime horaFin = LocalTime.parse(req.getHoraFin());
@@ -69,27 +73,50 @@ public class ProcesoReservaService {
         r.setHoraInicio(horaInicio);
         r.setHoraFin(horaFin);
 
-        // Relación con cancha y usuario
         r.setCancha(canchaRepository.getReferenceById(req.getCanchaId()));
         r.setUsuario(usuarioRepository.getReferenceById(req.getUsuarioId()));
 
         Reserva guardada = reservaRepository.save(r);
-
         return toResponse(guardada);
     }
 
     // --------------------------------------------------------
-    // CANCELAR RESERVA (ejemplo sin campo estado en la entidad)
+    // CANCELAR RESERVA
     // --------------------------------------------------------
     @Transactional
     public ReservaResponseDTO cancelar(Long id) {
         Reserva r = reservaRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + id));
 
-        // Si tu entidad tuviera campo estado, acá iría: r.setEstado("Cancelada");
-        // Como no lo tiene, simplemente devolvemos la reserva tal cual
-
         return toResponse(r);
+    }
+
+    // --------------------------------------------------------
+    // ✅ PAGAR RESERVA (CREA PAGO + LO ASOCIA)
+    // --------------------------------------------------------
+    @Transactional
+    public ReservaResponseDTO pagar(Long reservaId) {
+        Reserva r = reservaRepository.findById(reservaId)
+            .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + reservaId));
+
+        // Si ya tiene pago, devolvemos como está (evita duplicados)
+        if (r.getPago() != null) {
+            return toResponse(r);
+        }
+
+        Pago p = new Pago();
+        p.setFecha(Instant.now());
+
+        // 👇 monto fijo por ahora (después lo hacemos dinámico con DTO si querés)
+        p.setMonto(new BigDecimal("0.00"));
+
+        // Relación 1-1 (por tu Pago.java esto setea también r.setPago(this))
+        p.setReserva(r);
+
+        pagoRepository.save(p);
+        Reserva guardada = reservaRepository.save(r);
+
+        return toResponse(guardada);
     }
 
     // --------------------------------------------------------
@@ -115,7 +142,7 @@ public class ProcesoReservaService {
     }
 
     // --------------------------------------------------------
-    // MÉTODOS PRIVADOS PARA MAPEO DTO ↔ ENTIDAD
+    // MAPEOS DTO
     // --------------------------------------------------------
     private ReservaValidacionDTO toValidacion(ReservaRequestDTO req) {
         ReservaValidacionDTO v = new ReservaValidacionDTO();
@@ -131,26 +158,16 @@ public class ProcesoReservaService {
 
         dto.setId(r.getId());
 
-        // Pasamos LocalDate / LocalTime a String en el DTO
-        if (r.getFecha() != null) {
-            dto.setFecha(r.getFecha().toString());
-        }
-        if (r.getHoraInicio() != null) {
-            dto.setHoraInicio(r.getHoraInicio().toString());
-        }
-        if (r.getHoraFin() != null) {
-            dto.setHoraFin(r.getHoraFin().toString());
-        }
+        if (r.getFecha() != null) dto.setFecha(r.getFecha().toString());
+        if (r.getHoraInicio() != null) dto.setHoraInicio(r.getHoraInicio().toString());
+        if (r.getHoraFin() != null) dto.setHoraFin(r.getHoraFin().toString());
 
-        // La entidad Reserva NO tiene estado ni createdDate, así que esos campos quedarán null
-        // dto.setEstado(...);
-        // dto.setCreadoEn(...);
+        if (r.getUsuario() != null) dto.setUsuarioId(r.getUsuario().getId());
+        if (r.getCancha() != null) dto.setCanchaId(r.getCancha().getId());
 
-        if (r.getUsuario() != null) {
-            dto.setUsuarioId(r.getUsuario().getId());
-        }
-        if (r.getCancha() != null) {
-            dto.setCanchaId(r.getCancha().getId());
+        // ✅ CLAVE: mandar pagoId al front
+        if (r.getPago() != null) {
+            dto.setPagoId(r.getPago().getId());
         }
 
         return dto;
